@@ -1,0 +1,64 @@
+{% extends "core/base.html" %}
+
+{% block title %}User details | Maya Fashion Arts{% endblock %}
+
+{% block content %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">User details</h1>
+                <div class="text-secondary small">Custom user management, separate from Django admin.</div>
+            </div>
+            <a class="btn btn-primary" href="{% url 'members:register' %}">Register user</a>
+        </div>
+        <div class="table-responsive bg-white border rounded">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_record, form, form_id in user_rows %}
+                        <tr>
+                            <td>
+                                <form id="{{ form_id }}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="hidden" name="user_id" value="{{ user_record.pk }}">
+                                </form>
+                                {{ form.username }}
+                                {% for error in form.username.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </td>
+                            <td>
+                                {{ form.first_name }}
+                                {% for error in form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </td>
+                            <td>
+                                {{ form.last_name }}
+                                {% for error in form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </td>
+                            <td>
+                                {{ form.email }}
+                                {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </td>
+                            <td class="text-nowrap">
+                                <button class="btn btn-sm btn-success" type="submit" form="{{ form_id }}">Update</button>
+                                <form method="post" class="d-inline" onsubmit="return confirm('Delete {{ user_record.username|escapejs }}?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="user_id" value="{{ user_record.pk }}">
+                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center py-4">No users have been registered.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+{% endblock %}
